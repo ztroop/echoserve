@@ -15,4 +15,31 @@ echoserve -p <PORT> [-c <PATH_TO_CONFIG_FILE>]
 
 -p, --port: The port number EchoServe will listen on.
 -c, --config: (Optional) Path to the YAML configuration file.
-````
+```
+
+### Configuration File
+
+```yaml
+- name: "Example Endpoint 1"
+  endpoint: "/example1"
+  data:
+    message: "This is the first example response."
+    details:
+      info: "More details about Example 1"
+  status: 200
+
+- name: "Example Endpoint 2"
+  endpoint: "/example2"
+  data:
+    success: true
+    payload:
+      id: 12345
+      description: "Data for the second example"
+  status: 201
+
+- name: "Not Found Example"
+  endpoint: "/notfound"
+  data:
+    error: "Resource not found."
+  status: 404
+```
