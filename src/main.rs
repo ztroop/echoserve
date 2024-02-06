@@ -1,9 +1,12 @@
+use axum::response::IntoResponse;
 use axum::{http::StatusCode, response::Json, routing::get, Router};
-use std::sync::Arc;
 use clap::Parser;
-use std::net::SocketAddr;
-use tokio;
 use serde_json::Value;
+use std::collections::HashMap;
+use std::net::SocketAddr;
+use std::str::FromStr;
+use std::sync::Arc;
+use tokio;
 
 mod structs;
 
@@ -17,11 +20,15 @@ async fn main() {
         // Load and parse the YAML file
         let configs = load_yaml_config(&config_path);
         for config in configs {
-            let route_data = Arc::new(config.data);
+            let route_data = Arc::new(config.data.unwrap_or(Value::Null));
+            let route_headers =
+                Arc::new(config.headers.unwrap_or(HashMap::<String, String>::new()));
             let status_code = StatusCode::from_u16(config.status).unwrap_or(StatusCode::OK);
             app = app.route(
                 &config.endpoint,
-                get(move || handle_custom_route(route_data.clone(), status_code)),
+                get(move || {
+                    handle_custom_route(route_data.clone(), status_code, route_headers.clone())
+                }),
             );
         }
     } else {
@@ -50,7 +57,20 @@ async fn default_handler() -> &'static str {
 }
 
 // Handler for custom route
-async fn handle_custom_route(data: Arc<Value>, status: StatusCode) -> (StatusCode, Json<Value>) {
-    (status, Json(data.as_ref().clone()))
-}
+async fn handle_custom_route(
+    data: Arc<Value>,
+    status: StatusCode,
+    headers: Arc<HashMap<String, String>>,
+) -> impl axum::response::IntoResponse {
+    let mut response = axum::response::Response::new(Json(data.as_ref().clone()).into_response());
+    *response.status_mut() = status;
 
+    for (key, value) in headers.as_ref() {
+        response.headers_mut().insert(
+            axum::http::header::HeaderName::from_str(key).unwrap(),
+            axum::http::header::HeaderValue::from_str(value).unwrap(),
+        );
+    }
+
+    response
+}

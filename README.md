@@ -27,6 +27,9 @@ echoserve -p <PORT> [-c <PATH_TO_CONFIG_FILE>]
     details:
       info: "More details about Example 1"
   status: 200
+  headers:
+    Content-Type: "application/json"
+    Custom-Header: "Value1"
 
 - name: "Example Endpoint 2"
   endpoint: "/example2"
