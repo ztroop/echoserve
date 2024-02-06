@@ -1,5 +1,6 @@
 - name: "Example Endpoint 1"
   endpoint: "/example1"
+  method: "POST"
   data:
     message: "This is the first example response."
     details:
@@ -11,6 +12,7 @@
 
 - name: "Example Endpoint 2"
   endpoint: "/example2"
+  method: "POST"
   data:
     success: true
     payload:
@@ -20,6 +22,4 @@
 
 - name: "Not Found Example"
   endpoint: "/notfound"
-  data:
-    error: "Resource not found."
   status: 404

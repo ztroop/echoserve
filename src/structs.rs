@@ -15,7 +15,20 @@ pub struct Args {
 pub struct EndpointConfig {
     pub name: String,
     pub endpoint: String,
+    #[serde(default)]
+    pub method: HttpMethod,
     pub data: Option<serde_json::Value>,
     pub status: u16,
     pub headers: Option<HashMap<String, String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum HttpMethod {
+    #[default]
+    Get,
+    Post,
+    Put,
+    Delete,
+    Patch,
 }
