@@ -3,22 +3,32 @@ use axum::{http::StatusCode, response::Json, routing::get, Router};
 use clap::Parser;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
+use tower_http::trace::{self, TraceLayer};
+use tracing::Level;
 
 mod structs;
 
 #[tokio::main]
 async fn main() {
-    let args = structs::Args::parse();
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .compact()
+        .init();
 
+    let args = structs::Args::parse();
     let mut app = Router::new();
 
     if let Some(config_path) = args.config {
         // Load and parse the YAML file
         let configs = load_yaml_config(&config_path);
         for config in configs {
+            tracing::info!(
+                "Loaded config for ({}) uri={}",
+                config.name,
+                config.endpoint
+            );
             let route_data = Arc::new(config.data.unwrap_or(Value::Null));
             let route_headers =
                 Arc::new(config.headers.unwrap_or(HashMap::<String, String>::new()));
@@ -35,13 +45,19 @@ async fn main() {
         app = app.route("/", get(default_handler));
     }
 
+    // Add middleware
+    app = app.layer(
+        TraceLayer::new_for_http()
+            .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
+            .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
+    );
+
     // Start the server
-    let addr = SocketAddr::from(([0, 0, 0, 0], args.port));
-    println!("Listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
+    let addr = tokio::net::TcpListener::bind(format!("127.0.0.1:{}", args.port))
         .await
         .unwrap();
+    tracing::info!("🚀 Listening on 127.0.0.1:{}", args.port);
+    axum::serve(addr, app.into_make_service()).await.unwrap();
 }
 
 // Load YAML file and return a vector of endpoint configurations
