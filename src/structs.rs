@@ -7,6 +7,8 @@ use std::collections::HashMap;
 pub struct Args {
     #[arg(short = 'p')]
     pub port: u16,
+    #[arg(short = 'a')]
+    pub address: Option<String>,
     #[arg(short = 'c')]
     pub config: Option<String>,
 }

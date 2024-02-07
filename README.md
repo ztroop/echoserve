@@ -7,23 +7,28 @@ A mock server tool designed for testing API requests. It allows you to specify e
 ## Features
 
 - **Flexible Endpoint Configuration**: Define custom endpoints with associated JSON responses and status codes in a YAML file.
-- **Default Echo Mode**: In the absence of a configuration file, EchoServe responds to all requests with a 200 OK status.
+- **Default Echo Mode**: In the absence of a configuration file, `echoserve` responds to all requests with a `200 OK` status.
 - **Simple and Lightweight**: Easy to set up and use for quick API testing.
 
 ## Usage
 
 ```sh
-echoserve -p <PORT> [-c <PATH_TO_CONFIG_FILE>]
+Usage: echoserve [OPTIONS] -p <PORT>
 
--p, --port: The port number EchoServe will listen on.
--c, --config: (Optional) Path to the YAML configuration file.
+Options:
+  -p <PORT>         The port number to listen on.
+  -a <ADDRESS>      (Optional) The address to listen on. Default: 127.0.0.1
+  -c <CONFIG>       (Optional) Path to the YAML configuration file.
+  -h, --help        Print help
+  -V, --version     Print version
 ```
 
-### Configuration File
+### Configuration File Example
 
 ```yaml
 - name: "Example Endpoint 1"
   endpoint: "/example1"
+  method: "POST"
   data:
     message: "This is the first example response."
     details:
@@ -35,6 +40,7 @@ echoserve -p <PORT> [-c <PATH_TO_CONFIG_FILE>]
 
 - name: "Example Endpoint 2"
   endpoint: "/example2"
+  method: "POST"
   data:
     success: true
     payload:
@@ -44,7 +50,5 @@ echoserve -p <PORT> [-c <PATH_TO_CONFIG_FILE>]
 
 - name: "Not Found Example"
   endpoint: "/notfound"
-  data:
-    error: "Resource not found."
   status: 404
 ```
