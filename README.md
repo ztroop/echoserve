@@ -23,7 +23,18 @@ Options:
   -V, --version     Print version
 ```
 
-### Configuration File Example
+## Configuration
+
+Each item in the list (denoted by a dash -) represents a configuration for an API endpoint. Each endpoint configuration consists of several key-value pairs that define its properties. Here's what each key represents:
+
+- `name` - A human-readable identifier for the endpoint. It's used for reference and doesn't affect the endpoint's functionality.
+- `endpoint` - The URI path that the endpoint responds to. This is the part of the URL that follows your domain or base URL.
+- `method` - (Optional) Specifies the HTTP method (e.g., GET, POST) the endpoint should respond to. It defines the type of operation you want to perform.
+- `data` - (Optional) Contains the data that the endpoint will send back in the response. This section is structured as nested key-value pairs, representing the response body. It's typically used with methods like POST or PUT that involve sending data.
+- `status` - The HTTP status code that the endpoint will return. It indicates the result of the request (e.g., 200 for success, 404 for not found).
+- `headers` - (Optional) Specifies any additional HTTP headers that the response will include. Headers are often used for specifying the content type or for authentication.
+
+### File Example
 
 ```yaml
 - name: "Example Endpoint 1"
