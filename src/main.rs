@@ -42,7 +42,7 @@ async fn main() {
             });
         }
     } else {
-        // Default behavior
+        // Default behaviour
         app = app.route(
             "/*path",
             axum::routing::get(handlers::default_handler)
@@ -60,7 +60,7 @@ async fn main() {
             .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
     );
 
-    // Start the server
+    // Start server
     let addr = format!(
         "{}:{}",
         args.address.unwrap_or("127.0.0.1".to_string()),
