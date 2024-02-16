@@ -13,7 +13,7 @@ A mock server tool designed for testing API requests. It allows you to specify e
 
 ## Usage
 
-```sh
+```
 Usage: echoserve [OPTIONS]
 
 Options:
