@@ -1,12 +1,13 @@
 use axum::{http::StatusCode, Router};
 use clap::Parser;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::sync::Arc;
+use std::{collections::HashMap, time::Duration};
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
 mod handlers;
+mod latency;
 mod macros;
 mod structs;
 
@@ -54,11 +55,15 @@ async fn main() {
     }
 
     // Add middleware
-    app = app.layer(
-        TraceLayer::new_for_http()
-            .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
-            .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
-    );
+    app = app
+        .layer(
+            TraceLayer::new_for_http()
+                .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
+                .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
+        )
+        .layer(latency::with_latency(Duration::from_millis(
+            args.latency.unwrap_or(0),
+        )));
 
     // Start server
     let addr = format!(
