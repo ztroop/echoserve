@@ -9,16 +9,18 @@ A mock server tool designed for testing API requests. It allows you to specify e
 - **Flexible Endpoint Configuration**: Define custom endpoints with associated JSON responses and status codes in a YAML file.
 - **Default Echo Mode**: In the absence of a configuration file, `echoserve` responds to all requests with a `200 OK` status.
 - **Simple and Lightweight**: Easy to set up and use for quick API testing.
+- **Simulated Latency**: Customize latency to simulate delayed responses.
 
 ## Usage
 
 ```sh
-Usage: echoserve [OPTIONS] -p <PORT>
+Usage: echoserve [OPTIONS]
 
 Options:
-  -p <PORT>         The port number to listen on.
-  -a <ADDRESS>      (Optional) The address to listen on. Default: 127.0.0.1
-  -c <CONFIG>       (Optional) Path to the YAML configuration file.
+  -p <PORT>         Port number to listen on. (Default: 8080)
+  -a <ADDRESS>      Address to listen on. (Default: 127.0.0.1)
+  -l <LATENCY>      Simulated latency in milliseconds. (Default: 0)
+  -c <CONFIG>       Optional path to a YAML configuration file.
   -h, --help        Print help
   -V, --version     Print version
 ```
@@ -34,32 +36,4 @@ Each item in the list (denoted by a dash -) represents a configuration for an AP
 - `status` - The HTTP status code that the endpoint will return. It indicates the result of the request (e.g., 200 for success, 404 for not found).
 - `headers` - (Optional) Specifies any additional HTTP headers that the response will include. Headers are often used for specifying the content type or for authentication.
 
-### File Example
-
-```yaml
-- name: "Example Endpoint 1"
-  endpoint: "/example1"
-  method: "POST"
-  data:
-    message: "This is the first example response."
-    details:
-      info: "More details about Example 1"
-  status: 200
-  headers:
-    Content-Type: "application/json"
-    Custom-Header: "Value1"
-
-- name: "Example Endpoint 2"
-  endpoint: "/example2"
-  method: "POST"
-  data:
-    success: true
-    payload:
-      id: 12345
-      description: "Data for the second example"
-  status: 201
-
-- name: "Not Found Example"
-  endpoint: "/notfound"
-  status: 404
-```
+See [EXAMPLES](./examples/) for sample configuration files.
