@@ -69,7 +69,7 @@ async fn main() {
     let addr = format!(
         "{}:{}",
         args.address.unwrap_or("127.0.0.1".to_string()),
-        args.port
+        args.port.unwrap_or(8080)
     );
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     tracing::info!("🚀 Listening on {}", &addr);

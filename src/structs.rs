@@ -6,7 +6,7 @@ use std::{collections::HashMap, time::Duration};
 #[command(version, about, long_about = None)]
 pub struct Args {
     #[arg(short = 'p')]
-    pub port: u16,
+    pub port: Option<u16>,
     #[arg(short = 'a')]
     pub address: Option<String>,
     #[arg(short = 'c')]
