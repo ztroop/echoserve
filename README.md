@@ -38,6 +38,6 @@ Each item in the list represents a configuration for an API endpoint. Each endpo
 |`headers`|`None`|Specifies any additional HTTP headers that the response will include. Headers are often used for specifying the content type or for authentication.|
 |`data`|`None`|Specifies the response data. It has two keys: `format` and `payload`.|
 |`data.format`|`json`|Options: `json`, `xml`, `html`, and `text`.|
-|`data.payload`|`null`|Specifies either a string literal or key-value pairs.|
+|`data.payload`|`None`|Specifies either a string literal or key-value pairs.|
 
 See [EXAMPLES](./examples/) for a configuration sample.
