@@ -7,7 +7,7 @@ A mock server tool designed for testing API requests. It allows you to specify e
 ## Features
 
 - **Flexible Endpoint Configuration**: Define custom endpoints with associated JSON responses and status codes in a YAML file.
-- **Default Echo Mode**: In the absence of a configuration file, `echoserve` responds to all requests with a `200 OK` status.
+- **Default Echo Mode**: In the absence of a configuration file, it responds to all requests with a successful response.
 - **Simple and Lightweight**: Easy to set up and use for quick API testing.
 - **Simulated Latency**: Customize latency to simulate delayed responses.
 
@@ -37,7 +37,7 @@ Each item in the list represents a configuration for an API endpoint. Each endpo
 |`status`|`200`|The HTTP status code that the endpoint will return. It indicates the result of the request (e.g., 200 for success, 404 for not found).|
 |`headers`|`None`|Specifies any additional HTTP headers that the response will include. Headers are often used for specifying the content type or for authentication.|
 |`data`|`None`|Specifies the response data. It has two keys: `format` and `payload`.|
-|`data.format`|`json`|Options: `json`, `xml` and `text`.|
+|`data.format`|`json`|Options: `json`, `xml`, `html`, and `text`.|
 |`data.payload`|`null`|Specifies either a string literal or key-value pairs.|
 
 See [EXAMPLES](./examples/) for a configuration sample.
