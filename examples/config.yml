@@ -27,6 +27,23 @@
         - "test"
   status: 201
 
+- name: "Example Endpoint 3"
+  endpoint: "/example3"
+  method: "GET"
+  data:
+    format: "html"
+    payload: |
+      <html>
+        <head>
+          <title>Example 3</title>
+        </head>
+        <body>
+          <h1>Example 3</h1>
+          <p>This is the third example</p>
+        </body>
+      </html>
+  status: 200
+
 - name: "Not Found Example"
   endpoint: "/notfound"
   status: 404

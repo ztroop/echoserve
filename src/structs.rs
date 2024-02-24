@@ -50,6 +50,7 @@ pub enum Format {
     Json,
     Xml,
     Text,
+    Html,
 }
 
 impl Format {
@@ -58,6 +59,7 @@ impl Format {
             Format::Json => "application/json",
             Format::Xml => "application/xml",
             Format::Text => "text/plain",
+            Format::Html => "text/html",
         }
     }
 }

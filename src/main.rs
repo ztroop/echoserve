@@ -5,6 +5,7 @@ use std::{collections::HashMap, time::Duration};
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
+use crate::handlers::default_handler;
 use crate::structs::Data;
 
 mod handlers;
@@ -41,18 +42,16 @@ async fn main() {
             // Setting the route payload
             let route_payload = match route_data.payload {
                 Some(payload) => match payload {
-                    structs::JsonOrString::Json(value) => value,
-                    structs::JsonOrString::Str(value) => serde_json::json!(value),
+                    structs::JsonOrString::Json(value) => Some(value),
+                    structs::JsonOrString::Str(value) => Some(serde_json::json!(value)),
                 },
-                None => serde_json::Value::Null,
+                None => None,
             };
             // Setting the route status code
             let status_code = StatusCode::from_u16(config.status).unwrap_or(StatusCode::OK);
             app = route_with_method!(app, config.method, &config.endpoint, move || {
                 handlers::handle_custom_route(
-                    Arc::new(
-                        serde_json::to_value(&route_payload).unwrap_or(serde_json::Value::Null),
-                    ),
+                    Arc::new(route_payload),
                     status_code,
                     Arc::new(route_headers),
                 )
@@ -62,11 +61,11 @@ async fn main() {
         // Default behaviour
         app = app.route(
             "/*path",
-            axum::routing::get(handlers::default_handler)
-                .post(handlers::default_handler)
-                .put(handlers::default_handler)
-                .patch(handlers::default_handler)
-                .delete(handlers::default_handler),
+            axum::routing::get(default_handler)
+                .post(default_handler)
+                .put(default_handler)
+                .patch(default_handler)
+                .delete(default_handler),
         );
     }
 
