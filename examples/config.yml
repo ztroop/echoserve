@@ -1,23 +1,30 @@
 - name: "Example Endpoint 1"
   endpoint: "/example1"
-  method: "POST"
+  method: "GET"
   data:
-    message: "This is the first example response."
-    details:
-      info: "More details about Example 1"
+    format: "xml"
+    payload: |
+      <example>
+        <id>12345</id>
+        <description>Data for the first example</description>
+      </example>
   status: 200
   headers:
-    Content-Type: "application/json"
     Custom-Header: "Value1"
 
 - name: "Example Endpoint 2"
   endpoint: "/example2"
   method: "POST"
   data:
-    success: true
+    format: "json"
     payload:
       id: 12345
       description: "Data for the second example"
+      foo:
+        bar: "baz"
+      tags:
+        - "example"
+        - "test"
   status: 201
 
 - name: "Not Found Example"

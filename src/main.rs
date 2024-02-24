@@ -1,10 +1,11 @@
 use axum::{http::StatusCode, Router};
 use clap::Parser;
-use serde_json::Value;
 use std::sync::Arc;
 use std::{collections::HashMap, time::Duration};
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
+
+use crate::structs::Data;
 
 mod handlers;
 mod latency;
@@ -30,15 +31,30 @@ async fn main() {
                 config.name,
                 config.endpoint
             );
-            let route_data = Arc::new(config.data.unwrap_or(Value::Null));
-            let route_headers =
-                Arc::new(config.headers.unwrap_or(HashMap::<String, String>::new()));
+            let route_data = config.data.unwrap_or(Data::default());
+            // Setting the route headers and content type
+            let mut route_headers = config.headers.unwrap_or(HashMap::<String, String>::new());
+            route_headers.insert(
+                "content-type".to_string(),
+                route_data.format.as_content_type().to_string(),
+            );
+            // Setting the route payload
+            let route_payload = match route_data.payload {
+                Some(payload) => match payload {
+                    structs::JsonOrString::Json(value) => value,
+                    structs::JsonOrString::Str(value) => serde_json::json!(value),
+                },
+                None => serde_json::Value::Null,
+            };
+            // Setting the route status code
             let status_code = StatusCode::from_u16(config.status).unwrap_or(StatusCode::OK);
             app = route_with_method!(app, config.method, &config.endpoint, move || {
                 handlers::handle_custom_route(
-                    route_data.clone(),
+                    Arc::new(
+                        serde_json::to_value(&route_payload).unwrap_or(serde_json::Value::Null),
+                    ),
                     status_code,
-                    route_headers.clone(),
+                    Arc::new(route_headers),
                 )
             });
         }
@@ -56,14 +72,14 @@ async fn main() {
 
     // Add middleware
     app = app
+        .layer(latency::with_latency(Duration::from_millis(
+            args.latency.unwrap_or(0),
+        )))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
                 .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
-        )
-        .layer(latency::with_latency(Duration::from_millis(
-            args.latency.unwrap_or(0),
-        )));
+        );
 
     // Start server
     let addr = format!(
