@@ -6,12 +6,16 @@ use std::{collections::HashMap, fmt, time::Duration};
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
 pub struct Args {
+    #[clap(help = "Port number to listen on. (Default: 8080)")]
     #[arg(short = 'p')]
     pub port: Option<u16>,
+    #[clap(help = "Address to listen on. (Default: 127.0.0.1)")]
     #[arg(short = 'a')]
     pub address: Option<String>,
+    #[clap(help = "Optional path to a YAML configuration file.")]
     #[arg(short = 'c')]
     pub config: Option<String>,
+    #[clap(help = "Simulated latency in milliseconds. (Default: 0)")]
     #[arg(short = 'l')]
     pub latency: Option<u64>,
 }

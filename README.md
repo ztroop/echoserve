@@ -19,8 +19,8 @@ Usage: echoserve [OPTIONS]
 Options:
   -p <PORT>         Port number to listen on. (Default: 8080)
   -a <ADDRESS>      Address to listen on. (Default: 127.0.0.1)
-  -l <LATENCY>      Simulated latency in milliseconds. (Default: 0)
   -c <CONFIG>       Optional path to a YAML configuration file.
+  -l <LATENCY>      Simulated latency in milliseconds. (Default: 0)
   -h, --help        Print help
   -V, --version     Print version
 ```
