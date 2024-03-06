@@ -28,7 +28,7 @@ async fn main() {
         let configs = load_yaml_config(&config_path);
         for config in configs {
             tracing::info!(
-                "Loaded config for ({}) uri={}",
+                "Loaded endpoint: ({}) uri={}",
                 config.name,
                 config.endpoint
             );
