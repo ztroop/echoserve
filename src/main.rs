@@ -25,7 +25,6 @@ async fn main() {
     let mut app = Router::new();
 
     if let Some(config_path) = args.config {
-        // Load and parse the YAML file
         let configs = load_yaml_config(&config_path);
         let counters = Arc::new(Mutex::new(HashMap::<String, usize>::new()));
         for config in configs {
@@ -46,13 +45,11 @@ async fn main() {
                 continue;
             }
             let route_data = config.data.unwrap_or(Data::default());
-            // Setting the route headers and content type
             let mut route_headers = config.headers.unwrap_or(HashMap::<String, String>::new());
             route_headers.insert(
                 "content-type".to_string(),
                 route_data.format.as_content_type().to_string(),
             );
-            // Setting the route payload
             let route_payload = match route_data.payload {
                 Some(payload) => match payload {
                     structs::JsonOrString::Json(value) => Some(value),
@@ -60,7 +57,6 @@ async fn main() {
                 },
                 None => None,
             };
-            // Setting the route status code
             let status_code =
                 StatusCode::from_u16(config.status.unwrap_or(200)).unwrap_or(StatusCode::OK);
             app = route_with_method!(app, config.method, &config.endpoint, move || {
@@ -72,7 +68,6 @@ async fn main() {
             });
         }
     } else {
-        // Default behaviour
         app = app.route(
             "/*path",
             axum::routing::get(default_handler)
@@ -83,7 +78,6 @@ async fn main() {
         );
     }
 
-    // Add middleware
     app = app
         .layer(latency::with_latency(Duration::from_millis(
             args.latency.unwrap_or(0),
@@ -94,7 +88,6 @@ async fn main() {
                 .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
         );
 
-    // Start server
     let addr = format!(
         "{}:{}",
         args.address.unwrap_or("127.0.0.1".to_string()),
@@ -107,7 +100,6 @@ async fn main() {
         .unwrap();
 }
 
-// Load YAML file and return a vector of endpoint configurations
 fn load_yaml_config(file_path: &str) -> Vec<structs::EndpointConfig> {
     let file_content = std::fs::read_to_string(file_path).expect("Unable to read file");
     serde_yaml::from_str(&file_content).expect("Unable to parse YAML")
