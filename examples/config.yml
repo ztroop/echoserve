@@ -47,3 +47,23 @@
 - name: "Not Found Example"
   endpoint: "/notfound"
   status: 404
+
+- name: "Sequence Example"
+  endpoint: "/sequence"
+  method: "GET"
+  sequence:
+    - data:
+        format: "json"
+        payload:
+          message: "First response"
+      status: 200
+    - data:
+        format: "json"
+        payload:
+          message: "Second response"
+      status: 200
+    - data:
+        format: "json"
+        payload:
+          message: "Final response"
+      status: 404

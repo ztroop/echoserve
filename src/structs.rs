@@ -20,15 +20,23 @@ pub struct Args {
     pub latency: Option<u64>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SequenceResponse {
+    pub data: Option<Data>,
+    pub status: Option<u16>,
+    pub headers: Option<HashMap<String, String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EndpointConfig {
     pub name: String,
     pub endpoint: String,
     #[serde(default)]
     pub method: HttpMethod,
     pub data: Option<Data>,
-    pub status: u16,
+    pub status: Option<u16>,
     pub headers: Option<HashMap<String, String>>,
+    pub sequence: Option<Vec<SequenceResponse>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -109,7 +117,7 @@ impl<'de> Deserialize<'de> for JsonOrString {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum HttpMethod {
     #[default]

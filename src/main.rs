@@ -2,6 +2,7 @@ use axum::{http::StatusCode, Router};
 use clap::Parser;
 use std::sync::Arc;
 use std::{collections::HashMap, time::Duration};
+use tokio::sync::Mutex;
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
@@ -26,12 +27,24 @@ async fn main() {
     if let Some(config_path) = args.config {
         // Load and parse the YAML file
         let configs = load_yaml_config(&config_path);
+        let counters = Arc::new(Mutex::new(HashMap::<String, usize>::new()));
         for config in configs {
-            tracing::info!(
-                "Loaded endpoint: ({}) uri={}",
-                config.name,
-                config.endpoint
-            );
+            tracing::info!("Loaded endpoint: ({}) uri={}", config.name, config.endpoint);
+            if let Some(sequence) = &config.sequence {
+                let endpoint = config.endpoint.clone();
+                let method = config.method.clone();
+                let sequence = sequence.clone();
+                let counters = counters.clone();
+                app = route_with_method!(app, method, &endpoint, {
+                    let endpoint = endpoint.clone();
+                    let sequence = sequence.clone();
+                    let counters = counters.clone();
+                    async move || {
+                        handlers::handle_sequence_route(endpoint, sequence, counters).await
+                    }
+                });
+                continue;
+            }
             let route_data = config.data.unwrap_or(Data::default());
             // Setting the route headers and content type
             let mut route_headers = config.headers.unwrap_or(HashMap::<String, String>::new());
@@ -48,7 +61,8 @@ async fn main() {
                 None => None,
             };
             // Setting the route status code
-            let status_code = StatusCode::from_u16(config.status).unwrap_or(StatusCode::OK);
+            let status_code =
+                StatusCode::from_u16(config.status.unwrap_or(200)).unwrap_or(StatusCode::OK);
             app = route_with_method!(app, config.method, &config.endpoint, move || {
                 handlers::handle_custom_route(
                     Arc::new(route_payload),
