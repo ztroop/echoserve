@@ -93,7 +93,16 @@ async fn main() {
         args.address.unwrap_or("127.0.0.1".to_string()),
         args.port.unwrap_or(8080)
     );
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    let listener = match tokio::net::TcpListener::bind(&addr).await {
+        Ok(listener) => listener,
+        Err(e) => {
+            tracing::error!(
+                "Failed to bind to {}. The address is already in use or unavailable. Please check if another instance is running or use a different port.\nError: {}",
+                &addr, e
+            );
+            std::process::exit(1);
+        }
+    };
     tracing::info!("🚀 Listening on {}", &addr);
     axum::serve(listener, app.into_make_service())
         .await
