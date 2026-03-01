@@ -4,6 +4,18 @@
 
 Echoserve is a mock API server that serves configurable responses based on a YAML configuration file. It supports static responses as well as response sequences for endpoints.
 
+## Installation
+
+```sh
+cargo install echoserve
+```
+
+Or install from the git repository:
+
+```sh
+cargo install --git https://github.com/ztroop/echoserve echoserve
+```
+
 ## Features
 - Serve mock endpoints with configurable method, path, status, headers, and payload.
 - Support for JSON, XML, HTML, and plain text responses.
@@ -11,6 +23,12 @@ Echoserve is a mock API server that serves configurable responses based on a YAM
 - Simulated latency.
 
 ## Usage
+
+```sh
+echoserve --config examples/config.yml
+```
+
+Or run from source:
 
 ```sh
 cargo run -- --config examples/config.yml
@@ -25,6 +43,8 @@ cargo run -- --config examples/config.yml
 ## Configuration File Format
 
 The configuration file is a YAML file containing a list of endpoint definitions. Each endpoint can specify a static response or a sequence of responses.
+
+**Validation:** Endpoint paths must start with `/`. Empty sequences are rejected.
 
 ### Static Response Example
 ```yaml
