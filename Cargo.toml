@@ -2,7 +2,7 @@
 name = "echoserve"
 version = "2.2.3"
 edition = "2021"
-description = "A mock API server that serves configurable responses from YAML"
+description = "A mock HTTP API server with YAML config: static responses, response sequences, and simulated latency for testing"
 license = "MIT"
 repository = "https://github.com/ztroop/echoserve"
 homepage = "https://github.com/ztroop/echoserve"
