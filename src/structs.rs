@@ -20,7 +20,7 @@ pub struct Args {
     pub latency: Option<u64>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct SequenceResponse {
     pub data: Option<Data>,
     pub status: Option<u16>,
@@ -132,4 +132,78 @@ pub enum HttpMethod {
 pub struct LatencyMiddleware<S> {
     pub inner: S,
     pub delay: Duration,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn format_as_content_type_json() {
+        assert_eq!(Format::Json.as_content_type(), "application/json");
+    }
+
+    #[test]
+    fn format_as_content_type_xml() {
+        assert_eq!(Format::Xml.as_content_type(), "application/xml");
+    }
+
+    #[test]
+    fn format_as_content_type_text() {
+        assert_eq!(Format::Text.as_content_type(), "text/plain");
+    }
+
+    #[test]
+    fn format_as_content_type_html() {
+        assert_eq!(Format::Html.as_content_type(), "text/html");
+    }
+
+    #[test]
+    fn json_or_string_deserialize_string() {
+        let yaml = r#""hello world""#;
+        let result: JsonOrString = serde_yaml_ng::from_str(yaml).unwrap();
+        match result {
+            JsonOrString::Str(s) => assert_eq!(s, "hello world"),
+            _ => panic!("Expected Str variant"),
+        }
+    }
+
+    #[test]
+    fn json_or_string_deserialize_json() {
+        let yaml = r#"
+foo: bar
+nested:
+  a: 1
+"#;
+        let result: JsonOrString = serde_yaml_ng::from_str(yaml).unwrap();
+        match result {
+            JsonOrString::Json(v) => {
+                assert_eq!(v.get("foo").and_then(|v| v.as_str()), Some("bar"));
+            }
+            _ => panic!("Expected Json variant"),
+        }
+    }
+
+    #[test]
+    fn http_method_default() {
+        let method: HttpMethod = Default::default();
+        assert!(matches!(method, HttpMethod::Get));
+    }
+
+    #[test]
+    fn http_method_deserialize() {
+        let method: HttpMethod = serde_yaml_ng::from_str(r#""POST""#).unwrap();
+        assert!(matches!(method, HttpMethod::Post));
+    }
+
+    #[test]
+    fn data_default() {
+        let data = Data::default();
+        assert!(matches!(data.format, Format::Json));
+        assert!(data.payload.is_some());
+        match data.payload.as_ref().unwrap() {
+            JsonOrString::Json(v) => assert!(v.is_null()),
+            _ => panic!("Expected Json(Null)"),
+        }
+    }
 }

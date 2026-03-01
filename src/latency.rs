@@ -1,7 +1,6 @@
 use axum::{
     body::Body,
     http::{self, Response},
-    response::IntoResponse,
 };
 use std::{
     task::{Context, Poll},
@@ -18,7 +17,7 @@ where
     S::Future: Send + 'static,
     S::Error: Send + 'static,
     ReqBody: Send + 'static,
-    ResBody: IntoResponse + Send + 'static,
+    ResBody: Send + 'static,
 {
     type Response = S::Response;
     type Error = S::Error;
@@ -32,16 +31,12 @@ where
 
     fn call(&mut self, req: ReqBody) -> Self::Future {
         let future = self.inner.call(req);
-        let (tx, rx) = tokio::sync::oneshot::channel();
         let delay = self.delay;
 
-        tokio::spawn(async move {
+        Box::pin(async move {
             sleep(delay).await;
-            let result = future.await;
-            let _ = tx.send(result);
-        });
-
-        Box::pin(async move { rx.await.unwrap() })
+            future.await
+        })
     }
 }
 
